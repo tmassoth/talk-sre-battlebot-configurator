@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: battlebot-backend-catalog-config
+  namespace: battlebot-backend
+data:
+  DB_SERVER: ${DB_SERVER}
+  # talk-sre-sqlserver01.database.windows.net
+  DB_NAME: ${DB_NAME}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: battlebot-frontend-maintenance-mode
+  namespace: battlebot-frontend
+data:
+  VITE_MAINTENANCE_MODE: "false"

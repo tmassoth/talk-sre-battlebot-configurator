@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: battlebot-backend
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: battlebot-frontend

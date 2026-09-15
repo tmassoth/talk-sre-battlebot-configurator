@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: battlebot-backend-catalog
+  namespace: battlebot-backend
+spec:
+  selector:
+    app: battlebot-backend-catalog
+  ports:
+    - name: http
+      port: 3001
+      targetPort: 3001
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: battlebot-backend-payment
+  namespace: battlebot-backend
+spec:
+  selector:
+    app: battlebot-backend-payment
+  ports:
+    - name: http
+      port: 3002
+      targetPort: 3002
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: battlebot-frontend
+  namespace: battlebot-frontend
+spec:
+  selector:
+    app: battlebot-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  type: ClusterIP

@@ -1,0 +1,4 @@
+Flask>=3.0
+flask-cors>=4.0
+pyodbc>=5.1
+python-dotenv>=1.0

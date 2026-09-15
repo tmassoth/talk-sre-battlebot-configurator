@@ -1,0 +1,141 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: battlebot-backend-catalog
+  namespace: battlebot-backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: battlebot-backend-catalog
+  template:
+    metadata:
+      labels:
+        app: battlebot-backend-catalog
+    spec:
+      containers:
+        - name: battlebot-backend-catalog
+          image: ${ACR_NAME}.azurecr.io/battlebot-backend-catalog:0.0.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3001
+              name: http
+          envFrom:
+            - configMapRef:
+                name: battlebot-backend-catalog-config
+            - secretRef:
+                name: battlebot-backend-catalog-secret
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: battlebot-backend-payment
+  namespace: battlebot-backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: battlebot-backend-payment
+  template:
+    metadata:
+      labels:
+        app: battlebot-backend-payment
+    spec:
+      containers:
+        - name: battlebot-backend-payment
+          image: ${ACR_NAME}.azurecr.io/battlebot-backend-payment:0.0.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3002
+              name: http
+          envFrom:
+            - secretRef:
+                name: battlebot-backend-payment-secret
+          readinessProbe:
+            httpGet:
+              path: /payment-api/health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /payment-api/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: battlebot-frontend
+  namespace: battlebot-frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: battlebot-frontend
+  template:
+    metadata:
+      labels:
+        app: battlebot-frontend
+    spec:
+      containers:
+        - name: battlebot-frontend
+          image: ${ACR_NAME}.azurecr.io/battlebot-frontend:0.0.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              name: http
+          envFrom:
+            - configMapRef:
+                name: battlebot-frontend-maintenance-mode
+#          envFrom:
+#            - configMapRef:
+#                name: battlebot-backend-config
+#            - secretRef:
+#                name: battlebot-backend-secret
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

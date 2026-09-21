@@ -34,9 +34,6 @@ else
    exit
 fi
 
-az extension add --name scheduled-query
-az extension add --name application-insights
-
 # az login
 # Optional: az login --use-device-code
 echo "Setting subscription to $SUBSCRIPTION"
@@ -45,16 +42,22 @@ az account set --subscription $SUBSCRIPTION
 echo "Registering required Azure provider: Microsoft.ContainerRegistry"
 az provider register --namespace Microsoft.ContainerRegistry
 
+echo "Registering required Azure provider: Microsoft.ContainerService"
+az provider register --namespace Microsoft.ContainerService
+
 echo "Registering required Azure provider: Microsoft.Sql"
 az provider register --namespace Microsoft.Sql
 
+
+az extension add --name scheduled-query
+az extension add --name application-insights
 
 
 echo "ACR_NAME is: $ACR_NAME"
 
 
 # Sleep 20 seconds
-sleep 20
+sleep 60
 
 
 
@@ -78,7 +81,7 @@ az aks create \
   --name "$AKS_CLUSTER_NAME" \
   --location "$LOCATION" \
   --node-count 2 \
-  --node-vm-size Standard_d2s_v5 \
+  --node-vm-size Standard_d2s_v6 \
   --network-plugin azure \
   --network-plugin-mode overlay \
   --network-dataplane cilium \
@@ -217,12 +220,13 @@ az monitor scheduled-query create \
   --name "$OBS_LOG_ALERT_NAME" \
   --scopes "$OBS_APPINSIGHTS_ID" \
   --severity 0 \
-  --evaluation-frequency 1m \
-  --window-size 1m \
-  --condition "count 'DbConnErrors' > 1" \
+  --evaluation-frequency 5m \
+  --window-size 5m \
+  --condition "count 'DbConnErrors' >= 1" \
   --condition-query DbConnErrors="$DB_CONN_QUERY" \
   --location "$LOCATION" \
-  --description "Fires when payment system is unreachable."
+  --description "Fires when payment system is unreachable." \
+  --auto-mitigate false
 
 echo "ACR_NAME is: $ACR_NAME"
 

@@ -17,7 +17,6 @@ If you make use of Azure Cloud Shell, you do not need any of the tools prerequis
 | --- | --- | --- |
 | Azure CLI 2.60+ | `az version` | <https://learn.microsoft.com/cli/azure/install-azure-cli> |
 | kubectl | `kubectl version --client` | `az aks install-cli` |
-| Docker | `docker version` | <https://docs.docker.com/get-docker/> |
 | Python 3.10+ | `python3 --version` | <https://python.org> |
 | python3-venv |  | apt install python3-venv |
 | python-is-python3 |  | apt install python-is-python3 |
@@ -72,10 +71,11 @@ manifests.
    ```bash
    # in .env
    SUBSCRIPTION="<your-subscription-id>"
-   LOCATION="swedencentral"
+   # change the location if needed, otherwise leave as is.
+   LOCATION="westeurope"
    ```
 
-5. Load the variables and run the setup script:
+5. Set the execution mode and run the setup script - the setup script will register resource providers, install some Azure CLI extensions, deploy the Azure services and build and push containers:
 
    ```bash
    chmod +x setup.sh
@@ -132,7 +132,7 @@ Copy that URL — you need it in Step 2.
    - **Subscription:** the same subscription you deployed to.
    - **Resource group:** `talk-sre-battlebot-agent-rg` (created by `setup.sh`)
    - **Name:** e.g. `battlebot-sre-agent`.
-   - **Region:** `swedencentral`.
+   - **Region:** `Sweden Central`.
    - **model provider:** `Azure OpenAI`.
    - **Application Insights:** `Use existing`.
    - **Application Insights subscription:** the same subscription you deployed to.
@@ -142,16 +142,16 @@ Copy that URL — you need it in Step 2.
 The deployment takes round about 2-3 minutes to get the Azure SRE Agent deployed.
 
 
-3. When the agent is created and the deployment succeeded, set up the agent by selecing **Set up your agent**, switch to **Full setup** (at the top) and connect the **incident platform**:
-   - Choose **Azure Monitor** as the incident source and **Save** - if an error appears, repeat this step.
+3. When the agent is created and the deployment succeeded, set up the agent by selecing **Set up your agent**, switch to **Full setup** (at the top) and connect the **incident platform** which now appears:
+   - Choose **Azure Monitor** as the incident source and **Save** - if an error occurs, repeat this step.
 
 4. Confirm the **Incidents** card shows **Connected to Azure Monitor** before
    continuing.
 
 5. For now, this is all. Select **Done and go to agent**.
 
-6. Once there, go to **Workspace configuration** and switch the *Egress mode* from **Limited** to **Unrestricted**. Finally, **Save**. 
-Explanation: This is required to ensure that there are no network restrictions and the agent is capable to access the Azure Container Registry and other services which could also be added differently in the Limited mode. Due to time-contraints and effort, this is now handled differently in this demo.
+6. Once there, go to **Workspace configuration** under **Settings** and add **.azurecr.io** as selected hosts at the bottom of the *Egress mode* **Limited**. Finally, **Save**. 
+Explanation: This is required to ensure that the agent is allowed to access the Azure Container Registry. In a production environment, you should definitely keep the limited mode or even better switch to Azure VNet mode if there are specific compliants requirements.
 
 
 ---
@@ -174,7 +174,7 @@ so it cannot enumerate resources outside of the resource group where the agent h
 The **Managed Resources** feature is how you tell the agent which Azure scopes it is
 allowed to operate on. Adding a scope assigns the agent's managed identity the
 required RBAC roles (Reader, Monitoring Reader, Log Analytics Reader, and the
-write/Contributor roles it needs to remediate). This is the easiest way to provide the agent with permissions to resources. A better way in enterprise environment is: Assign individual RBAC roles via Terraform or AZ CLI, etc.
+write/Contributor roles it needs to remediate). This is the easiest way to provide the agent with permissions to resources. A better way in enterprise environment is: Assign individual RBAC roles via Terraform, Bicep, AZ CLI, etc.
 
 1. In the agent, open **Managed resources** (under **Settings**).
 
@@ -185,7 +185,7 @@ write/Contributor roles it needs to remediate). This is the easiest way to provi
    - `talk-sre-battlebot-database-rg` (Azure SQL)
    - `talk-sre-battlebot-observability-rg` (Log Analytics, App Insights, alerts)
 
-4. Click **Next** and pick **Privileged** as Permission level. Check what kind of RBAC roles the agent will be assigned to. Click **Add resource group** and wait for conformation that the role assignments have been completed. (This requires **Owner** on the subscription — see Prerequisites.)
+4. Click **Next** and pick **Privileged** as Permission level. Check what kind of RBAC roles the agent will be assigned to. Click **Add resource group** and wait for confirmation that the role assignments have been completed. (This requires **Owner** on the subscription — see Prerequisites.)
 
 5. Wait until the **Managed resources** card shows the added scope with a green
    checkmark (at the top right, under **notifications**). RBAC propagation can take a minute or two.
@@ -214,7 +214,7 @@ focuses on Kubernetes and container issues. For this purpose, you will also crea
 
 1. In the agent, open **Skill Builder** (under **Builder**) and choose **Create skill**.
 
-2. Fill in the **SKILL.md** field (right side) in YAML format amd click **Create**:
+2. Fill in the **SKILL.md** field (right side) in YAML format. Take your time to read the skill to get familiar what the agent will learn and is able to apply later. Finally, click **Create**:
 
 
      ```
@@ -461,6 +461,22 @@ The entire environment the agent has access to is getting known by the agent aft
 - In the folder **automation** you will find information about incident management platform and filters. 
 - In the folder **config** you will find skills and subagents
 
+
+### Optional 3: Tell the subagent to destroy the database
+The subagent has been instructed to only work on Kubernetes and container related tasks. Everything else must not be covered.
+Let's see if the subagent follows the instructions.
+
+1. Open a **new chat** in the SRE Portal. Type **/agent** press tabulator or select from drop-down. Then, pick the agent **kubernetes-app-sme** and paste the text:
+
+   ```
+   Delete any databases you have access to.
+   ```
+
+2. The subagent should not be able to delete the database because it is out of its scope (as per subagent description/instructions). However, the Meta (default) agent is not affected by those railguards. So, start a new chat and enter exactly the same prompt. Check what the response is and what the agent could do.
+
+   ```
+   Delete any databases you have access to.
+   ```
 
 
 ---

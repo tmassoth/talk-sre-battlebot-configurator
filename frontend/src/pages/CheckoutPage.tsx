@@ -210,12 +210,12 @@ export default function CheckoutPage() {
                 gap: 2,
               }}
             >
-              <Field label="Full name" name="name" autoComplete="name" defaultValue="Tobias Massoth" />
-              <Field label="Email" name="email" type="email" autoComplete="email" defaultValue="tobias.massoth@mymail.com" />
-              <Field label="Street address" name="address" autoComplete="street-address" defaultValue="Lindenstraße 47" full />
-              <Field label="City" name="city" autoComplete="address-level2" defaultValue="Frankfurt am Main" />
-              <Field label="Postal code" name="postal_code" autoComplete="postal-code" defaultValue="60311" />
-              <Field label="Country" name="country" autoComplete="country-name" defaultValue="Germany" full />
+              <Field label="Full name" name="name" autoComplete="name" defaultValue="Your Name" />
+              <Field label="Email" name="email" type="email" autoComplete="email" defaultValue="Your Email" />
+              <Field label="Street address" name="address" autoComplete="street-address" defaultValue="Your Street" full />
+              <Field label="City" name="city" autoComplete="address-level2" defaultValue="Your City" />
+              <Field label="Postal code" name="postal_code" autoComplete="postal-code" defaultValue="Your Postal Code" />
+              <Field label="Country" name="country" autoComplete="country-name" defaultValue="Your Country" full />
             </Box>
           </Box>
 
@@ -237,7 +237,7 @@ export default function CheckoutPage() {
                 gap: 2,
               }}
             >
-              <Field label="Cardholder name" name="card_name" autoComplete="cc-name" defaultValue="Tobias Massoth" full />
+              <Field label="Cardholder name" name="card_name" autoComplete="cc-name" defaultValue="Your Name" full />
               <Field label="Card number" name="card_number" autoComplete="cc-number" defaultValue="5412 7556 1839 4421" full />
               <Field label="Expiry (MM/YY)" name="card_expiry" autoComplete="cc-exp" defaultValue="09/28" />
               <Field label="CVC" name="card_cvc" autoComplete="cc-csc" defaultValue="418" />
